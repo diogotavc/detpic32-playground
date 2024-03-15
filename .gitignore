@@ -1,0 +1,5 @@
+# ignore files generated during compilation
+*.elf
+*.hex
+*.map
+*.o
