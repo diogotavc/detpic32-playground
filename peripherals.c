@@ -12,6 +12,8 @@ void initComponents(unsigned char component, unsigned char enable)
     // char | component | pins
     //  0   |  display  | RB[8,14], RD[5,6]
     //  1   |  LEDs     | RE[0,7]
+
+    // (default state is input)
     //  2   |  button   | RD[8]
     //  3   |  switches | RB[0,3]
     //  4   |  adc      | ???
@@ -29,25 +31,6 @@ void initComponents(unsigned char component, unsigned char enable)
             TRISB = TRISB | 0x8000; // reset displays to default state
             TRISD = TRISD | 0x0060; // reset ports for display selection
         }
-        break;
-    case 1:
-        printf("Not implemented yet!\n");
-        break;
-    case 2:
-        if (enable)
-        {
-            TRISD = TRISD & 0x0100; // tell button to input
-        }
-        else
-        {
-            TRISD = TRISD & 0x0100; // reset button to default state
-        }
-        break;
-    case 3:
-        printf("Not implemented yet!\n");
-        break;
-    case 4:
-        printf("Not implemented yet!\n");
         break;
     default:
         break;
@@ -95,7 +78,6 @@ int main(void)
     unsigned int counter = 0;
 
     initComponents(0, 1);
-    initComponents(2, 1);
     while (counter < 256)
     {
         internalCounter = 0;
