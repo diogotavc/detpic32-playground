@@ -91,11 +91,8 @@ char stateSwitch()
     return (PORTB & 0x000F);
 }
 
-int main(void)
+void counter(unsigned int rate, unsigned int time)
 {
-    unsigned int rate = 250;                        // 250Hz -> 500Hz per display
-    unsigned int time = 2000 / (stateSwitch() + 1); // time in ms for each number
-
     unsigned int refresh = 1000 / (rate * 2);
     unsigned int internalCounter = 0;
     unsigned int counter = 0;
@@ -119,6 +116,18 @@ int main(void)
     }
     initComponent(0, 0);
     initComponent(1, 0);
+}
+
+int main(void)
+{
+    unsigned int rate = 250;                        // 250Hz -> 500Hz per display
+    unsigned int time = 2000 / (stateSwitch() + 1); // time in ms for each number
+
+    while(1)
+    {
+        counter(rate,time);
+        while (!stateButton());
+    }
 
     return 0;
 }
