@@ -86,23 +86,29 @@ char stateButton()
     return !((PORTD & 0x0100) >> 8);
 }
 
+char stateSwitch()
+{
+    return (PORTB & 0x000F);
+}
+
 int main(void)
 {
-    unsigned int rate = 250; // 250Hz -> 500Hz per display
-    unsigned int time = 1000;  // time in ms for each number
+    unsigned int rate = 250;                        // 250Hz -> 500Hz per display
+    unsigned int time = 2000 / (stateSwitch() + 1); // time in ms for each number
 
     unsigned int refresh = 1000 / (rate * 2);
     unsigned int internalCounter = 0;
     unsigned int counter = 0;
 
-    initComponent(0,1);
-    initComponent(1,1);
+    initComponent(0, 1);
+    initComponent(1, 1);
     while (counter < 256)
     {
         internalCounter = 0;
         cmdLED(counter);
         do
         {
+            time = 2000 / (stateSwitch() + 1);
             cmdDisplay(counter);
             delay(refresh);
         } while (++internalCounter < (time / refresh));
@@ -111,6 +117,8 @@ int main(void)
             counter++;
         }
     }
-    initComponent(0,0);
-    initComponent(1,0);
+    initComponent(0, 0);
+    initComponent(1, 0);
+
+    return 0;
 }
