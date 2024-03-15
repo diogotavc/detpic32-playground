@@ -14,9 +14,9 @@ void initComponent(unsigned char component, unsigned char enable)
     //  1   |  LEDs     | RE[0,7]
 
     // (default state is input)
-    //  2   |  button   | RD[8]
-    //  3   |  switches | RB[0,3]
-    //  4   |  adc      | ???
+    //  2   |  adc      | AN[4] (analog RB[4])
+    //  3   |  button   | RD[8]
+    //  4   |  switches | RB[0,3]
     switch (component)
     {
     case 0:
@@ -42,6 +42,30 @@ void initComponent(unsigned char component, unsigned char enable)
         {
             LATE = LATE & 0xFF00;   // reset all LEDs
             TRISE = TRISE | 0x00FF; // reset LEDs to default state
+        }
+        break;
+    case 2:
+        if (enable)
+        {
+            TRISBbits.TRISB4 = 1;       // disable digital output
+            AD1PCFGbits.PCFG4 = 0;      // configure as analog input (AN4)
+            AD1CON1bits.SSRC = 7;       // conversion trigger selection bits
+            AD1CON1bits.CLRASAM = 1;    // stop conv. when 1st adc interrupt is generated
+            AD1CON3bits.SAMC = 16;      // sample time is 16 TAD (*100 ns)
+            AD1CON2bits.SMPI = 3;       // (4) samples stores in ADC1BUF[0,3]
+            AD1CHSbits.CH0SA = 4;       // analog channel 4 (AN4)
+            AD1CON1bits.ON = 1;         // enable adc
+        }
+        else
+        {
+            TRISBbits.TRISB4 = 1;
+            AD1PCFGbits.PCFG4 = 1;
+            AD1CON1bits.SSRC = 0;
+            AD1CON1bits.CLRASAM = 0;
+            AD1CON3bits.SAMC = 0;
+            AD1CON2bits.SMPI = 0;
+            AD1CHSbits.CH0SA = 0;
+            AD1CON1bits.ON = 0;
         }
         break;
     default:
@@ -99,6 +123,7 @@ void counter(unsigned int rate, unsigned int time)
 
     initComponent(0, 1);
     initComponent(1, 1);
+    initComponent(2, 1);
     while (counter < 256)
     {
         internalCounter = 0;
@@ -106,7 +131,24 @@ void counter(unsigned int rate, unsigned int time)
         do
         {
             time = 2000 / (stateSwitch() + 1);
-            cmdDisplay(counter);
+
+            AD1CON1bits.ASAM = 1;
+            while (IFS1bits.AD1IF == 0);
+            IFS1bits.AD1IF = 0;
+
+            // pint-size bit of debugging
+            printInt(ADC1BUF0, 16 | 3 << 16);
+            putChar('\r');
+
+            if(ADC1BUF0 > 0)
+            {
+                initComponent(0, 1);
+                refresh = 1000 / ((ADC1BUF0+1)/3);
+                cmdDisplay(counter);
+            } else
+            {
+                initComponent(0, 0);
+            }
             delay(refresh);
         } while (++internalCounter < (time / refresh));
         if (!stateButton())
@@ -116,6 +158,7 @@ void counter(unsigned int rate, unsigned int time)
     }
     initComponent(0, 0);
     initComponent(1, 0);
+    initComponent(2, 0);
 }
 
 int main(void)
