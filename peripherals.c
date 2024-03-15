@@ -7,7 +7,7 @@ void delay(int ms)
         ;
 }
 
-void initComponents(unsigned char component, unsigned char enable)
+void initComponent(unsigned char component, unsigned char enable)
 {
     // char | component | pins
     //  0   |  display  | RB[8,14], RD[5,6]
@@ -30,6 +30,18 @@ void initComponents(unsigned char component, unsigned char enable)
             LATD = LATD & 0xFF9F;   // disable displays
             TRISB = TRISB | 0x8000; // reset displays to default state
             TRISD = TRISD | 0x0060; // reset ports for display selection
+        }
+        break;
+    case 1:
+        if (enable)
+        {
+            TRISE = TRISE & 0xFF00; // tell LEDs to output
+            LATE = LATE & 0xFF00;   // reset all LEDs
+        }
+        else
+        {
+            LATE = LATE & 0xFF00;   // reset all LEDs
+            TRISE = TRISE | 0x00FF; // reset LEDs to default state
         }
         break;
     default:
@@ -62,25 +74,33 @@ void cmdDisplay(unsigned char value)
     }
 }
 
+void cmdLED(unsigned char value)
+{
+    LATE = LATE & 0xFF00;
+    LATE = LATE | (value & 0x01) | (value & 0x02) | (value & 0x04) | (value & 0x08);
+    LATE = LATE | (value & 0x10) | (value & 0x20) | (value & 0x40) | (value & 0x80);
+}
+
 char stateButton()
 {
-    unsigned char state = (PORTD & 0x0100) >> 8;
-    return !state;
+    return !((PORTD & 0x0100) >> 8);
 }
 
 int main(void)
 {
     unsigned int rate = 250; // 250Hz -> 500Hz per display
-    unsigned int time = 50;  // time in ms for each number
+    unsigned int time = 1000;  // time in ms for each number
 
     unsigned int refresh = 1000 / (rate * 2);
     unsigned int internalCounter = 0;
     unsigned int counter = 0;
 
-    initComponents(0, 1);
+    initComponent(0,1);
+    initComponent(1,1);
     while (counter < 256)
     {
         internalCounter = 0;
+        cmdLED(counter);
         do
         {
             cmdDisplay(counter);
@@ -91,5 +111,6 @@ int main(void)
             counter++;
         }
     }
-    initComponents(0, 0);
+    initComponent(0,0);
+    initComponent(1,0);
 }
