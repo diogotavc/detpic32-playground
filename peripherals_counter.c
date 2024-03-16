@@ -3,8 +3,7 @@
 void delay(int ms)
 {
     resetCoreTimer();
-    while (readCoreTimer() < ms * 20000)
-        ;
+    while (readCoreTimer() < ms * 20000);
 }
 
 void initComponent(unsigned char component, unsigned char enable)
@@ -91,11 +90,12 @@ char stateSwitch()
     return (PORTB & 0x000F);
 }
 
-void counter(unsigned int rate, unsigned int time)
+void counter(unsigned int rate, unsigned int maxTime)
 {
     unsigned int refresh = 1000 / (rate * 2);
     unsigned int internalCounter = 0;
     unsigned int counter = 0;
+    unsigned int time = maxTime / (stateSwitch() + 1);
 
     initComponent(0, 1);
     initComponent(1, 1);
@@ -105,7 +105,7 @@ void counter(unsigned int rate, unsigned int time)
         cmdLED(counter);
         do
         {
-            time = 2000 / (stateSwitch() + 1);
+            time = maxTime / (stateSwitch() + 1);
             cmdDisplay(counter);
             delay(refresh);
         } while (++internalCounter < (time / refresh));
@@ -120,12 +120,12 @@ void counter(unsigned int rate, unsigned int time)
 
 int main(void)
 {
-    unsigned int rate = 250;                        // 250Hz -> 500Hz per display
-    unsigned int time = 2000 / (stateSwitch() + 1); // time in ms for each number
+    unsigned int rate = 250;  // 250Hz -> 500Hz per display
+    unsigned int time = 2000; // highest time in ms for each number (ranges from time to (time/16) ms)
 
-    while(1)
+    while (1)
     {
-        counter(rate,time);
+        counter(rate, time);
         while (!stateButton());
     }
 
