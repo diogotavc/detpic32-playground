@@ -43,6 +43,29 @@ void initComponent(unsigned char component, unsigned char enable)
             TRISE = TRISE | 0x00FF; // reset LEDs to default state
         }
         break;
+    case 2:
+        if (enable)
+        {
+            TRISBbits.TRISB4 = 1;       // disable digital output
+            AD1PCFGbits.PCFG4 = 0;      // configure as analog input (AN4)
+            AD1CON1bits.SSRC = 7;       // conversion trigger selection bits
+            AD1CON1bits.CLRASAM = 1;    // stop conv. when 1st adc interrupt is generated
+            AD1CON3bits.SAMC = 16;      // sample time is 16 TAD (*100 ns)
+            AD1CON2bits.SMPI = 3;       // (4) samples stores in ADC1BUF[0,3]
+            AD1CHSbits.CH0SA = 4;       // analog channel 4 (AN4)
+            AD1CON1bits.ON = 1;         // enable adc
+        }
+        else
+        {
+            TRISBbits.TRISB4 = 1;
+            AD1PCFGbits.PCFG4 = 1;
+            AD1CON1bits.SSRC = 0;
+            AD1CON1bits.CLRASAM = 0;
+            AD1CON3bits.SAMC = 0;
+            AD1CON2bits.SMPI = 0;
+            AD1CHSbits.CH0SA = 0;
+            AD1CON1bits.ON = 0;
+        }
     default:
         break;
     }
