@@ -6,6 +6,18 @@ void delay(int ms)
     while (readCoreTimer() < ms * 20000);
 }
 
+int delayAsync(int* internalCounter, int ms)
+{
+    if(*internalCounter < ms){
+        (*internalCounter)++;
+        return 0;
+    } else
+    {
+        *internalCounter = 0;
+        return 1;
+    }
+}
+
 void initComponent(unsigned char component, unsigned char enable)
 {
     // char | component | pins
