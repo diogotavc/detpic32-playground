@@ -25,9 +25,9 @@ void initComponent(unsigned char component, unsigned char enable)
     //  1   |  LEDs     | RE[0,7]
 
     // (default state is input)
-    //  2   |  button   | RD[8]
-    //  3   |  switches | RB[0,3]
-    //  4   |  adc      | ???
+    //  2   |  adc      | AN[4] (analog on RB[4])
+    //  3   |  button   | RD[8]
+    //  4   |  switches | RB[0,3]
     switch (component)
     {
     case 0:
