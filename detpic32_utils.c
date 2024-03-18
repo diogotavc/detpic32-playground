@@ -83,8 +83,10 @@ void initComponent(unsigned char component, unsigned char enable)
     }
 }
 
-void cmdDisplay(unsigned char value)
+void cmdDisplay(unsigned char value, unsigned char brightness)
 {
+    static const int rate = 40000;  // rate = (1000 * 20_000) / (refresh * 2)
+
     static const char hex2disp[] = {
         0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07,
         0x7F, 0x6F, 0x77, 0x7C, 0x39, 0x5E, 0x79, 0x71};
@@ -105,6 +107,13 @@ void cmdDisplay(unsigned char value)
         LATD = (LATD & 0xFF9F) | 0x0020;
         LATB = (LATB & 0x80FF) | hex2disp[digit_low] << 8;
         disp = 1;
+    }
+    resetCoreTimer();
+    while (readCoreTimer() < rate)
+    {
+        if (readCoreTimer() > (rate/100)*brightness) {
+            LATB = (LATB & 0x80FF);
+        }
     }
 }
 
