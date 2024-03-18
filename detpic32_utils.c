@@ -83,7 +83,7 @@ void initComponent(unsigned char component, unsigned char enable)
     }
 }
 
-void cmdDisplay(unsigned char value, unsigned char brightness)
+void cmdDisplay(unsigned char value)
 {
     static const int rate = 40000;  // rate = (1000 * 20_000) / (refresh * 2)
 
@@ -108,10 +108,16 @@ void cmdDisplay(unsigned char value, unsigned char brightness)
         LATB = (LATB & 0x80FF) | hex2disp[digit_low] << 8;
         disp = 1;
     }
+
+    // read brightness from adc
+    AD1CON1bits.ASAM = 1;
+    while (IFS1bits.AD1IF == 0);
+    IFS1bits.AD1IF = 0;
+
     resetCoreTimer();
     while (readCoreTimer() < rate)
     {
-        if (readCoreTimer() > (rate/100)*brightness) {
+        if (readCoreTimer() > (rate/102)*(ADC1BUF0/10)) {
             LATB = (LATB & 0x80FF);
         }
     }

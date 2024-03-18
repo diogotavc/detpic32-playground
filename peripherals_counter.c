@@ -15,7 +15,7 @@ void counter(unsigned int maxTime)
         do
         {
             time = maxTime / (stateSwitch() + 1);
-            cmdDisplay(counter,100);
+            cmdDisplay(counter);
         } while (++internalCounter < (time / refresh));
         if (!stateButton())
         {
