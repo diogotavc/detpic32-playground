@@ -125,9 +125,7 @@ void cmdDisplay(unsigned char value)
 
 void cmdLED(unsigned char value)
 {
-    LATE = LATE & 0xFF00;
-    LATE = LATE | (value & 0x01) | (value & 0x02) | (value & 0x04) | (value & 0x08);
-    LATE = LATE | (value & 0x10) | (value & 0x20) | (value & 0x40) | (value & 0x80);
+    LATE = (LATE & 0xFF00) | value;
 }
 
 char stateButton()
