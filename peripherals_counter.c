@@ -8,8 +8,6 @@ void counter(unsigned int maxTime)
     unsigned int counter = 0;
     unsigned int time = maxTime / (stateSwitch() + 1);
 
-    initComponent(0, 1);
-    initComponent(1, 1);
     while (counter < 256)
     {
         internalCounter = 0;
@@ -24,8 +22,6 @@ void counter(unsigned int maxTime)
             counter++;
         }
     }
-    initComponent(0, 0);
-    initComponent(1, 0);
 }
 
 int main(void)
@@ -34,7 +30,13 @@ int main(void)
 
     while (1)
     {
+        initComponent(0, 1);
+        initComponent(1, 1);
+        initComponent(2, 1);
         counter(time);
+        initComponent(0, 0);
+        initComponent(1, 0);
+        initComponent(2, 0);
         while (!stateButton());
     }
 
