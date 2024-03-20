@@ -18,7 +18,7 @@ int main(void)
         int *p = (int *)(&ADC1BUF0);
         for ( i = 0; i < 16; i++) {
             printInt(p[i*4], 16 | 3 << 16); // Print each conversion result
-            putChar('\n');                  // Put \n to avoid unreadable outputs
+            putChar(' ');                   // Put space to avoid unreadable outputs
         }
         putChar('\n');                      // Put another \n to help distinguish readings
         IFS1bits.AD1IF = 0;                 // Reset AD1IF
