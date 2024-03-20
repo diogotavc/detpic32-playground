@@ -25,6 +25,11 @@ void cmdDisplay(unsigned char value)
     }
 }
 
+unsigned char toBcd(unsigned char value)
+{
+    return ((value / 10) << 4) + (value % 10);
+}
+
 int main(void)
 {
     TRISBbits.TRISB4 = 1;    // Disable digital output
@@ -35,18 +40,18 @@ int main(void)
     AD1CON2bits.SMPI = 3;    // (4) samples stores in ADC1BUF[0,3]
     AD1CHSbits.CH0SA = 4;    // Analog channel 4 (AN4)
     AD1CON1bits.ON = 1;      // Enable adc
-    TRISB = TRISB & 0x80FF;  // tell displays to output
-    TRISD = TRISD & 0xFF9F;  // enable ports for display selection
-    int i = 0;
-    int average, voltage;
+    TRISB &= 0x80FF;  // tell displays to output
+    TRISD &= 0xFF9F;  // enable ports for display selection
     while (1)
     {
+        int i = 0;
+        int average, voltage;
         if(i == 0)
         {
             average = 0;
             voltage = 0;
-            AD1CON1bits.ASAM = 1;               // Start conversion
-            while (IFS1bits.AD1IF == 0);        // Wait while conversion not done (AD1IF == 0)
+            AD1CON1bits.ASAM = 1;        // Start conversion
+            while (IFS1bits.AD1IF == 0); // Wait while conversion not done (AD1IF == 0)
             int *p = (int *)(&ADC1BUF0);
             for ( i = 0; i < 4; i++) {
                 average += p[i*4];
@@ -54,9 +59,9 @@ int main(void)
             average /= 4;
             voltage = (average * 33 + 511) / 1023;
         }
-        cmdDisplay(voltage);    // missing conversion from hex to decimal before sending to display
+        cmdDisplay(toBcd(voltage));       // Sends value in decimal to display
         resetCoreTimer();
-        while (readCoreTimer() < 200000);
-        i = (i + 1) % 20;
+        while (readCoreTimer() < 200000); // Wait 10 ms (10*20000)
+        i = (i + 1) % 20;                 // Resets i every 200 ms (200/10)
     }
 }
