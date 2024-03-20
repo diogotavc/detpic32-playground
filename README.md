@@ -3,7 +3,7 @@
 This is a very empty repository for testing and playing around with the detpic32.
 
 > [!NOTE]
-> While these files can be useful for solving [AC2](https://www.ua.pt/pt/uc/15184) guides, solved exercises may not be included here.
+> This repository can be useful for solving [AC2](https://www.ua.pt/pt/uc/15184) guides, so I've decided to also put solved exercises here.
 
 ## Programs
 
